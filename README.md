@@ -16,8 +16,8 @@ It speaks the Redis protocol (RESP), so you can talk to it with the real `redis-
 | `PING <message>` | `PING hello`             | `$5\r\nhello\r\n` |
 | `ECHO <message>` | `ECHO hey`               | `$3\r\nhey\r\n` |
 | `SET <key> <value>` | `SET name Satyam`        | `+OK` |
-| `SET <key> <value> EX <seconds>` | `SET name tushar EX 10`  | `+OK`, key expires after 10 seconds |
-| `SET <key> <value> PX <milliseconds>` | `SET name tushar PX 100` | `+OK`, key expires after 100 ms |
+| `SET <key> <value> EX <seconds>` | `SET name satyam EX 10`  | `+OK`, key expires after 10 seconds |
+| `SET <key> <value> PX <milliseconds>` | `SET name satyam PX 100` | `+OK`, key expires after 100 ms |
 | `GET <key>` | `GET name`               | `$6\r\ntushar\r\n`, or `$-1\r\n` if the key doesn't exist or has expired |
 
 Data is kept in memory only, shared by all clients, and lost when the server stops.
@@ -58,11 +58,11 @@ PONG
 redis-cli -p 6379 echo "hello world"
 "hello world"
 
-redis-cli -p 6379 set name tushar
+redis-cli -p 6379 set name satyam
 OK
 
 redis-cli -p 6379 get name
-"tushar"
+"satyam"
 
 redis-cli -p 6379 get missing
 (nil)
