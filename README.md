@@ -10,15 +10,15 @@ It speaks the Redis protocol (RESP), so you can talk to it with the real `redis-
 - Reads and writes the **RESP** protocol only
 - Commands:
 
-| Command | Example | Reply |
-|---|---|---|
-| `PING` | `PING` | `+PONG` |
-| `PING <message>` | `PING hello` | `$5\r\nhello\r\n` |
-| `ECHO <message>` | `ECHO hey` | `$3\r\nhey\r\n` |
-| `SET <key> <value>` | `SET name tushar` | `+OK` |
-| `SET <key> <value> EX <seconds>` | `SET name tushar EX 10` | `+OK`, key expires after 10 seconds |
+| Command | Example                  | Reply |
+|---|--------------------------|---|
+| `PING` | `PING`                   | `+PONG` |
+| `PING <message>` | `PING hello`             | `$5\r\nhello\r\n` |
+| `ECHO <message>` | `ECHO hey`               | `$3\r\nhey\r\n` |
+| `SET <key> <value>` | `SET name Satyam`        | `+OK` |
+| `SET <key> <value> EX <seconds>` | `SET name tushar EX 10`  | `+OK`, key expires after 10 seconds |
 | `SET <key> <value> PX <milliseconds>` | `SET name tushar PX 100` | `+OK`, key expires after 100 ms |
-| `GET <key>` | `GET name` | `$6\r\ntushar\r\n`, or `$-1\r\n` if the key doesn't exist or has expired |
+| `GET <key>` | `GET name`               | `$6\r\ntushar\r\n`, or `$-1\r\n` if the key doesn't exist or has expired |
 
 Data is kept in memory only, shared by all clients, and lost when the server stops.
 A plain `SET` on a key removes any expiry it had before, like real Redis.
