@@ -15,6 +15,10 @@ It speaks the Redis protocol (RESP), so you can talk to it with the real `redis-
 | `PING` | `PING` | `+PONG` |
 | `PING <message>` | `PING hello` | `$5\r\nhello\r\n` |
 | `ECHO <message>` | `ECHO hey` | `$3\r\nhey\r\n` |
+| `SET <key> <value>` | `SET name tushar` | `+OK` |
+| `GET <key>` | `GET name` | `$6\r\ntushar\r\n`, or `$-1\r\n` if the key doesn't exist |
+
+Data is kept in memory only, shared by all clients, and lost when the server stops.
 
 ## Requirements
 
@@ -50,6 +54,15 @@ PONG
 
 redis-cli -p 6379 echo "hello world"
 "hello world"
+
+redis-cli -p 6379 set name tushar
+OK
+
+redis-cli -p 6379 get name
+"tushar"
+
+redis-cli -p 6379 get missing
+(nil)
 ```
 
 ### With PowerShell (no install needed)
@@ -101,6 +114,7 @@ The server replies with these RESP types:
 |---|---|---|
 | Simple string | `+` | `+PONG\r\n` |
 | Bulk string | `$` | `$3\r\nhey\r\n` |
+| Null bulk string | `$-1` | `$-1\r\n` (GET on a missing key) |
 | Error | `-` | `-ERR unknown command 'FOO'\r\n` |
 
 ### Errors
@@ -114,7 +128,7 @@ The server replies with these RESP types:
 ## Project structure
 
 ```
-src/main/java/com/example/redis/RedisApplication.java   server: event loop, RESP parser, commands
+src/main/java/com/example/redis/RedisApplication.java   server: event loop, RESP parser, commands, key-value store
 build.gradle                                             build settings (Java 17)
 ```
 
@@ -125,6 +139,5 @@ It receives the command as a list of strings (`["ECHO", "hey"]`) and returns the
 
 ## Next steps
 
-- `SET` / `GET` (needs a key-value store and the null reply `$-1\r\n`)
 - Key expiry (`SET key value PX 100`)
 - Move the RESP parser and reply helpers into their own class

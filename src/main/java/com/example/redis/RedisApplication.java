@@ -13,8 +13,10 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootApplication
 public class RedisApplication {
@@ -28,6 +30,9 @@ public class RedisApplication {
     // A parsed command and how many bytes of input it used
     private record Command(List<String> args, int bytesUsed) {
     }
+
+    // Key-value store shared by all clients. A plain HashMap is safe because the event loop is single-threaded.
+    private static final Map<String, String> store = new HashMap<>();
 
     public static void main(String[] args) {
 
@@ -133,6 +138,19 @@ public class RedisApplication {
                     return wrongArgs("echo");
                 }
                 return bulkString(args.get(1));
+            case "SET":
+                if (args.size() != 3) {
+                    return wrongArgs("set");
+                }
+                store.put(args.get(1), args.get(2));
+                return "+OK\r\n";
+            case "GET":
+                if (args.size() != 2) {
+                    return wrongArgs("get");
+                }
+                String value = store.get(args.get(1));
+                // Null bulk string when the key doesn't exist
+                return value == null ? "$-1\r\n" : bulkString(value);
             default:
                 return "-ERR unknown command '" + args.get(0) + "'\r\n";
         }
