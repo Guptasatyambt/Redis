@@ -18,10 +18,14 @@ class DataStoreTest {
     }
 
     @Test
-    void keyWithoutExpiryNeverExpires() {
+    void keyWithoutTtlExpiresAfterDefault() {
         store.set("name", "tushar");
-        now.addAndGet(1_000_000);
+
+        now.addAndGet(DataStore.DEFAULT_TTL_MILLIS - 1);
         assertEquals("tushar", store.get("name"));
+
+        now.addAndGet(1);
+        assertNull(store.get("name"));
     }
 
     @Test
@@ -36,7 +40,7 @@ class DataStoreTest {
     }
 
     @Test
-    void plainSetClearsPreviousExpiry() {
+    void plainSetReplacesPreviousExpiryWithDefault() {
         store.set("name", "tushar", 100);
         store.set("name", "tushar");
         now.addAndGet(200);
@@ -47,7 +51,7 @@ class DataStoreTest {
     void removeExpiredDeletesOnlyExpiredKeys() {
         store.set("short", "a", 100);
         store.set("long", "b", 1_000);
-        store.set("forever", "c");
+        store.set("default", "c");
 
         now.addAndGet(500);
         store.removeExpired();

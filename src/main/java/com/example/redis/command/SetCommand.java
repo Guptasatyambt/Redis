@@ -6,7 +6,7 @@ import com.example.redis.store.DataStore;
 import java.util.List;
 
 /**
- * SET key value              -> +OK
+ * SET key value              -> +OK, key expires after 10 minutes
  * SET key value EX seconds   -> +OK, key expires after the given seconds
  * SET key value PX millis    -> +OK, key expires after the given milliseconds
  */
@@ -48,7 +48,7 @@ public class SetCommand implements Command {
             ttlMillis = option.equals("EX") ? amount * 1000 : amount;
         }
 
-        // A plain SET also clears any expiry the key had before, like real Redis
+        // A plain SET replaces any expiry the key had before with the default 10 minutes
         if (ttlMillis == null) {
             store.set(key, value);
         } else {

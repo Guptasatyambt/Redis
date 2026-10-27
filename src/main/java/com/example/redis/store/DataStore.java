@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.function.LongSupplier;
 
 /**
- * In-memory key-value store with optional expiry per key.
+ * In-memory key-value store where every key expires.
+ * Keys set without an explicit TTL expire after DEFAULT_TTL_MILLIS (10 minutes).
  * A plain HashMap is safe because the event loop is single-threaded.
  *
  * Expired keys are removed in two ways, like real Redis:
@@ -14,11 +15,11 @@ import java.util.function.LongSupplier;
  */
 public class DataStore {
 
-    private static final long NO_EXPIRY = -1;
+    public static final long DEFAULT_TTL_MILLIS = 10 * 60 * 1000;
 
     private record Entry(String value, long expiresAt) {
         boolean isExpired(long now) {
-            return expiresAt != NO_EXPIRY && now >= expiresAt;
+            return now >= expiresAt;
         }
     }
 
@@ -35,7 +36,7 @@ public class DataStore {
     }
 
     public void set(String key, String value) {
-        data.put(key, new Entry(value, NO_EXPIRY));
+        set(key, value, DEFAULT_TTL_MILLIS);
     }
 
     public void set(String key, String value, long ttlMillis) {

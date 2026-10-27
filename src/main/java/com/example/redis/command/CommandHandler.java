@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Looks up the command by name and runs it.
  */
-public class CommandHandler {
+public class  CommandHandler {
 
     private final Map<String, Command> commands = new HashMap<>();
 
