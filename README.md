@@ -120,8 +120,10 @@ Instead of one thread per client, a single thread uses a `Selector` to wait unti
 Each key stores the time (in milliseconds) when it expires. Expired keys are removed in two ways, like real Redis:
 
 - **Lazily** – `GET` checks the expiry time; an expired key is deleted and `GET` returns null.
-- **Periodically** – once a second the event loop deletes every expired key, so keys that are never read
-  again don't stay in memory forever.
+- **Periodically** – once a second the event loop checks a random sample of 20 keys and deletes the
+  expired ones. If 30% or more of the sample had expired, many more expired keys are probably left, so it
+  scans every key and deletes all expired ones. Otherwise it skips the full scan, so the check stays cheap
+  even with millions of keys. Keys that are never read again still get removed over time.
 
 ### RESP protocol
 
