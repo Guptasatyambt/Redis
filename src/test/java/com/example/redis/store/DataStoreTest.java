@@ -22,10 +22,10 @@ class DataStoreTest {
 
     @Test
     void keyWithoutTtlExpiresAfterDefault() {
-        store.set("name", "tushar");
+        store.set("name", "satyam");
 
         now.addAndGet(DataStore.DEFAULT_TTL_MILLIS - 1);
-        assertEquals("tushar", store.get("name"));
+        assertEquals("satyam", store.get("name"));
 
         now.addAndGet(1);
         assertNull(store.get("name"));
@@ -33,10 +33,10 @@ class DataStoreTest {
 
     @Test
     void keyExpiresAfterTtl() {
-        store.set("name", "tushar", 100);
+        store.set("name", "satyam", 100);
 
         now.addAndGet(99);
-        assertEquals("tushar", store.get("name"));
+        assertEquals("satyam", store.get("name"));
 
         now.addAndGet(1);
         assertNull(store.get("name"));
@@ -44,10 +44,10 @@ class DataStoreTest {
 
     @Test
     void plainSetReplacesPreviousExpiryWithDefault() {
-        store.set("name", "tushar", 100);
-        store.set("name", "tushar");
+        store.set("name", "satyam", 100);
+        store.set("name", "satyam");
         now.addAndGet(200);
-        assertEquals("tushar", store.get("name"));
+        assertEquals("satyam", store.get("name"));
     }
 
     @Test
@@ -96,6 +96,17 @@ class DataStoreTest {
     }
 
     @Test
+    void removeAllExpiredDeletesEveryExpiredKey() {
+        addKeys("short", 5, 100);
+        addKeys("long", 95, 1_000);
+
+        now.addAndGet(500);
+        store.removeAllExpired();
+
+        assertEquals(95, store.size());
+    }
+
+    @Test
     void getStillWorksAfterKeysAreRemoved() {
         store.set("a", "1", 100);
         store.set("b", "2", 1_000);
@@ -119,8 +130,8 @@ class DataStoreTest {
 
     @Test
     void hugeTtlDoesNotOverflow() {
-        store.set("name", "tushar", Long.MAX_VALUE);
-        assertEquals("tushar", store.get("name"));
+        store.set("name", "satyam", Long.MAX_VALUE);
+        assertEquals("satyam", store.get("name"));
     }
 
 }

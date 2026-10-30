@@ -120,6 +120,11 @@ public class DataStore {
         }
     }
 
+    // Checks every key, without sampling first
+    public void removeAllExpired() {
+        removeAllExpired(clock.getAsLong());
+    }
+
     private void removeAllExpired(long now) {
         // Walk backwards: remove() moves the last key into the freed slot, and that key was already checked
         for (int i = keys.size() - 1; i >= 0; i--) {

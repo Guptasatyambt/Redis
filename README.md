@@ -124,6 +124,8 @@ Each key stores the time (in milliseconds) when it expires. Expired keys are rem
   expired ones. If 30% or more of the sample had expired, many more expired keys are probably left, so it
   scans every key and deletes all expired ones. Otherwise it skips the full scan, so the check stays cheap
   even with millions of keys. Keys that are never read again still get removed over time.
+- **Full scan** – every 30 minutes the event loop scans every key and deletes all expired ones, no matter
+  what the sample showed, so no expired key stays in memory for more than about 30 minutes.
 
 ### RESP protocol
 

@@ -24,11 +24,14 @@ public class RedisServer {
     // How long select() waits before giving the loop a chance to run background work
     private static final long SELECT_TIMEOUT_MILLIS = 100;
     private static final long EXPIRED_KEY_CLEANUP_INTERVAL_MILLIS = 1000;
+    // Sampling can leave expired keys behind; this full scan guarantees they are gone within 30 minutes
+    private static final long FULL_EXPIRED_KEY_SCAN_INTERVAL_MILLIS = 30 * 60 * 1000;
 
     private final int port;
     private final CommandHandler commandHandler;
     private final DataStore store;
     private long lastCleanup = System.currentTimeMillis();
+    private long lastFullScan = System.currentTimeMillis();
 
     public RedisServer(int port, CommandHandler commandHandler, DataStore store) {
         this.port = port;
@@ -115,7 +118,11 @@ public class RedisServer {
     // Keys are also removed lazily on GET; this catches keys that expire and are never read again
     private void removeExpiredKeysIfDue() {
         long now = System.currentTimeMillis();
-        if (now - lastCleanup >= EXPIRED_KEY_CLEANUP_INTERVAL_MILLIS) {
+        if (now - lastFullScan >= FULL_EXPIRED_KEY_SCAN_INTERVAL_MILLIS) {
+            store.removeAllExpired();
+            lastFullScan = now;
+            lastCleanup = now;
+        } else if (now - lastCleanup >= EXPIRED_KEY_CLEANUP_INTERVAL_MILLIS) {
             store.removeExpired();
             lastCleanup = now;
         }
